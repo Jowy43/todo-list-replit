@@ -1,9 +1,18 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { Todo } from '../types/todo';
 
-const STORAGE_KEY = 'todo-app-data';
-const MAX_DAYS = 14;
+const BIN_ID = '65aa1234abcd1234' // You'll need to create a bin at JSONbin.io
+const API_KEY = '$2a$10$YOUR_API_KEY' // You'll need to get this from JSONbin.io
+
+const api = axios.create({
+  baseURL: 'https://api.jsonbin.io/v3/b',
+  headers: {
+    'X-Master-Key': API_KEY,
+    'Content-Type': 'application/json',
+  }
+});
 
 const generateExampleData = (): Todo[] => {
   const today = new Date();
@@ -36,41 +45,47 @@ const generateExampleData = (): Todo[] => {
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
-  useEffect(() => {
-    const savedTodos = localStorage.getItem(STORAGE_KEY);
-    if (savedTodos) {
-      setTodos(JSON.parse(savedTodos));
-    } else {
-      // Only add example data if no data exists
+  const fetchTodos = async () => {
+    try {
+      const response = await api.get(`/${BIN_ID}/latest`);
+      setTodos(response.data.record || []);
+    } catch (error) {
       const exampleData = generateExampleData();
       setTodos(exampleData);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(exampleData));
+      await api.put(`/${BIN_ID}`, exampleData);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    cleanupOldTasks();
-  }, [todos]);
+    fetchTodos();
+  }, []);
 
-  const cleanupOldTasks = () => {
-    const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - MAX_DAYS);
-    setTodos(prev => prev.filter(todo => new Date(todo.date) >= twoWeeksAgo));
+  const saveTodos = async (newTodos: Todo[]) => {
+    try {
+      await api.put(`/${BIN_ID}`, newTodos);
+    } catch (error) {
+      console.error('Error saving todos:', error);
+    }
   };
 
-  const addTodo = (todo: Omit<Todo, 'id'>) => {
-    setTodos(prev => [...prev, { ...todo, id: Date.now() }]);
+  const addTodo = async (todo: Omit<Todo, 'id'>) => {
+    const newTodos = [...todos, { ...todo, id: Date.now() }];
+    setTodos(newTodos);
+    await saveTodos(newTodos);
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map(todo => 
+  const toggleTodo = async (id: number) => {
+    const newTodos = todos.map(todo => 
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+    );
+    setTodos(newTodos);
+    await saveTodos(newTodos);
   };
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const deleteTodo = async (id: number) => {
+    const newTodos = todos.filter(todo => todo.id !== id);
+    setTodos(newTodos);
+    await saveTodos(newTodos);
   };
 
   const checkReminders = useCallback(() => {
@@ -81,9 +96,11 @@ export const useTodos = () => {
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(`Task Reminder: ${todo.text}`);
           }
-          setTodos(prev => prev.map(t => 
+          const newTodos = todos.map(t => 
             t.id === todo.id ? { ...t, reminder: { ...t.reminder!, notified: true }} : t
-          ));
+          );
+          setTodos(newTodos);
+          saveTodos(newTodos);
         }
       }
     });

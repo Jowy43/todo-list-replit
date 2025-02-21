@@ -46,8 +46,25 @@
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 2rem;
   transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  padding: 2rem;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.todos-container {
+  max-height: calc(100vh - 400px);
+  overflow-y: auto;
+  padding-right: 1rem;
 }
 
 .app.dark {
