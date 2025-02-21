@@ -7,11 +7,33 @@ interface Todo {
   text: string;
   completed: boolean;
   date: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate: string;
+}
+
+interface Statistics {
+  total: number;
+  completed: number;
+  pending: number;
+  overdue: number;
 }
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const categories = ['work', 'personal', 'shopping', 'health'];
+  
   const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: "Complete project presentation", completed: true, date: new Date().toISOString().split('T')[0] },
+    { 
+      id: 1, 
+      text: "Complete project presentation", 
+      completed: true, 
+      date: new Date().toISOString().split('T')[0],
+      category: 'work',
+      priority: 'high',
+      dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0]
+    },
     { id: 2, text: "Review team updates", completed: false, date: new Date().toISOString().split('T')[0] },
     { id: 3, text: "Send weekly report", completed: false, date: new Date(Date.now() - 86400000).toISOString().split('T')[0] },
     { id: 4, text: "Team meeting", completed: true, date: new Date(Date.now() - 86400000).toISOString().split('T')[0] },
@@ -27,6 +49,22 @@ function App() {
   const [selectedDay, setSelectedDay] = useState<string>(new Date().toISOString().split('T')[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const todosPerPage = 5;
+
+  const getStatistics = (): Statistics => {
+    const now = new Date();
+    return {
+      total: todos.length,
+      completed: todos.filter(t => t.completed).length,
+      pending: todos.filter(t => !t.completed).length,
+      overdue: todos.filter(t => !t.completed && new Date(t.dueDate) < now).length
+    };
+  };
+
+  const filteredTodos = todos.filter(todo => {
+    const matchesSearch = todo.text.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || todo.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +116,33 @@ function App() {
         </button>
         
         <h1>Todo List</h1>
+        
+        <div className="stats-container">
+          <div className="stat-item">Total: {getStatistics().total}</div>
+          <div className="stat-item">Completed: {getStatistics().completed}</div>
+          <div className="stat-item">Pending: {getStatistics().pending}</div>
+          <div className="stat-item">Overdue: {getStatistics().overdue}</div>
+        </div>
+
+        <div className="filters">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search todos..."
+            className="search-input"
+          />
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="category-select"
+          >
+            <option value="all">All Categories</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+            ))}
+          </select>
+        </div>
         
         <form onSubmit={addTodo} className="input-form">
           <input

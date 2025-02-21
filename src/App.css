@@ -1,4 +1,47 @@
 
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #646cff;
+  color: white;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.search-input,
+.category-select {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #646cff;
+  font-size: 1rem;
+}
+
+.dark .search-input,
+.dark .category-select {
+  background-color: #333;
+  color: white;
+}
+
+.light .search-input,
+.light .category-select {
+  background-color: white;
+  color: #333;
+}
+
+
 .app {
   min-height: 100vh;
   display: flex;
