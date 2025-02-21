@@ -10,7 +10,10 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedDay, setSelectedDay] = useState<string>(new Date().toISOString().split('T')[0]);
+  const today = new Date().toISOString().split('T')[0];
+  const [selectedDay, setSelectedDay] = useState<string>(
+    sortDays(Object.keys(groupTodosByDay(todos)))[0] || today
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const todosPerPage = 5;
   const categories = ['work', 'personal', 'shopping', 'health'];
@@ -19,6 +22,15 @@ function App() {
     const interval = setInterval(checkReminders, 60000);
     return () => clearInterval(interval);
   }, [checkReminders]);
+
+  useEffect(() => {
+    const sortedDays = sortDays(Object.keys(todosByDay));
+    if (sortedDays.length > 0) {
+      setSelectedDay(sortedDays[0]);
+    } else {
+      setSelectedDay(today);
+    }
+  }, [todos]);
 
   const filteredTodos = todos.filter(todo => {
     const matchesSearch = todo.text.toLowerCase().includes(searchTerm.toLowerCase());
@@ -32,15 +44,17 @@ function App() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
+      const today = new Date().toISOString().split('T')[0];
       addTodo({
         text: inputValue,
         completed: false,
-        date: new Date().toISOString().split('T')[0],
+        date: today,
         category: selectedCategory === 'all' ? 'personal' : selectedCategory,
         priority: 'medium',
-        dueDate: new Date().toISOString().split('T')[0]
+        dueDate: today
       });
       setInputValue('');
+      setSelectedDay(today);
     }
   };
 
