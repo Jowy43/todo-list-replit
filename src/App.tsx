@@ -24,7 +24,9 @@ function App() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [darkMode, setDarkMode] = useState(true);
-  const [visibleDays, setVisibleDays] = useState(7);
+  const [selectedDay, setSelectedDay] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const todosPerPage = 5;
 
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,44 +90,70 @@ function App() {
           <button type="submit" className="add-button">Add</button>
         </form>
 
-        <div className="days-container">
-          {sortedDays.slice(0, visibleDays).map(day => (
-            <div key={day} className="day-group">
-              <h2 className="day-header">
-                {new Date(day).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </h2>
-              <ul className="todo-list">
-                {todosByDay[day].map(todo => (
-                  <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={() => toggleTodo(todo.id)}
-                    />
-                    <span>{todo.text}</span>
-                    <button 
-                      onClick={() => deleteTodo(todo.id)}
-                      className="delete-button"
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <select 
+          value={selectedDay} 
+          onChange={(e) => {
+            setSelectedDay(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="day-selector"
+        >
+          {sortedDays.map(day => (
+            <option key={day} value={day}>
+              {new Date(day).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </option>
           ))}
+        </select>
+
+        <div className="todos-container">
+          <ul className="todo-list">
+            {todosByDay[selectedDay]?.slice(
+              (currentPage - 1) * todosPerPage,
+              currentPage * todosPerPage
+            ).map(todo => (
+              <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => toggleTodo(todo.id)}
+                />
+                <span>{todo.text}</span>
+                <button 
+                  onClick={() => deleteTodo(todo.id)}
+                  className="delete-button"
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {todosByDay[selectedDay] && todosByDay[selectedDay].length > todosPerPage && (
+            <div className="pagination">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="pagination-button"
+              >
+                Previous
+              </button>
+              <span className="page-info">
+                Page {currentPage} of {Math.ceil(todosByDay[selectedDay].length / todosPerPage)}
+              </span>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(todosByDay[selectedDay].length / todosPerPage), p + 1))}
+                disabled={currentPage >= Math.ceil(todosByDay[selectedDay].length / todosPerPage)}
+                className="pagination-button"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
-        
-        {sortedDays.length > visibleDays && (
-          <button onClick={loadMore} className="load-more-button">
-            Load More Days
-          </button>
-        )}
       </div>
     </div>
   );
