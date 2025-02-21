@@ -4,10 +4,6 @@ import { API_CONFIG } from '../config/api';
 
 const api = axios.create({
   baseURL: API_CONFIG.JSONBIN_URL,
-  headers: {
-    ...API_CONFIG.HEADERS,
-    'Content-Type': 'application/json',
-  }
 });
 
 export const ApiService = {
@@ -15,7 +11,8 @@ export const ApiService = {
     try {
       const response = await api.get(`/${API_CONFIG.JSONBIN_ID}`, {
         headers: {
-          'X-Bin-Meta': false
+          'X-Master-Key': API_CONFIG.JSONBIN_KEY,
+          'X-Bin-Meta': 'false'
         }
       });
       return response.data || [];
@@ -27,8 +24,13 @@ export const ApiService = {
 
   async updateTodos(todos: any[]) {
     try {
-      const response = await api.put(`/${API_CONFIG.JSONBIN_ID}`, todos);
-      return response.data.record;
+      const response = await api.put(`/${API_CONFIG.JSONBIN_ID}`, todos, {
+        headers: {
+          'X-Master-Key': API_CONFIG.JSONBIN_KEY,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
     } catch (error) {
       console.error('Error updating todos:', error);
       throw error;
