@@ -9,7 +9,7 @@ const api = axios.create({
 export const ApiService = {
   async getTodos() {
     try {
-      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}`, {
+      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}/latest`, {
         headers: {
           'X-Master-Key': API_CONFIG.JSONBIN_KEY,
           'X-Bin-Meta': 'false'
