@@ -5,6 +5,34 @@ import { Todo } from '../types/todo';
 const STORAGE_KEY = 'todo-app-data';
 const MAX_DAYS = 14;
 
+const generateExampleData = (): Todo[] => {
+  const today = new Date();
+  const exampleTodos: Todo[] = [];
+  
+  for (let i = 0; i < 5; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    
+    exampleTodos.push({
+      id: Date.now() + i,
+      text: `Example task for ${dateStr}`,
+      completed: Math.random() > 0.5,
+      date: dateStr,
+      category: ['work', 'personal', 'shopping', 'health'][Math.floor(Math.random() * 4)],
+      priority: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
+      dueDate: dateStr,
+      notes: `This is a note for task ${i + 1}`,
+      reminder: {
+        time: '09:00',
+        notified: false
+      }
+    });
+  }
+  
+  return exampleTodos;
+};
+
 export const useTodos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
@@ -12,6 +40,11 @@ export const useTodos = () => {
     const savedTodos = localStorage.getItem(STORAGE_KEY);
     if (savedTodos) {
       setTodos(JSON.parse(savedTodos));
+    } else {
+      // Only add example data if no data exists
+      const exampleData = generateExampleData();
+      setTodos(exampleData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(exampleData));
     }
   }, []);
 
