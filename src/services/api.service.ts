@@ -13,8 +13,12 @@ const api = axios.create({
 export const ApiService = {
   async getTodos() {
     try {
-      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}/latest`);
-      return response.data.record || [];
+      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}`, {
+        headers: {
+          'X-Bin-Meta': false
+        }
+      });
+      return response.data || [];
     } catch (error) {
       console.error('Error fetching todos:', error);
       return [];

@@ -5,7 +5,7 @@ export const API_CONFIG = {
   JSONBIN_URL: "https://api.jsonbin.io/v3/b",
   HEADERS: {
     'X-Master-Key': "$2a$10$ca0/pCcVzNay1ZiXTTPXpefAkB20ooNsbMHuze6JXDzh3rXb1pekO",
-    'Content-Type': 'application/json',
-    'X-Bin-Meta': 'false'
+    'X-Access-Key': "$2a$10$ca0/pCcVzNay1ZiXTTPXpefAkB20ooNsbMHuze6JXDzh3rXb1pekO",
+    'Content-Type': 'application/json'
   }
 };
