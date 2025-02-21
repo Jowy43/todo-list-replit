@@ -13,8 +13,8 @@ const api = axios.create({
 export const ApiService = {
   async getTodos() {
     try {
-      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}`);
-      return response.data;
+      const response = await api.get(`/${API_CONFIG.JSONBIN_ID}/latest`);
+      return response.data.record || [];
     } catch (error) {
       console.error('Error fetching todos:', error);
       return [];
@@ -23,9 +23,11 @@ export const ApiService = {
 
   async updateTodos(todos: any[]) {
     try {
-      await api.put(`/${API_CONFIG.JSONBIN_ID}`, todos);
+      const response = await api.put(`/${API_CONFIG.JSONBIN_ID}`, todos);
+      return response.data.record;
     } catch (error) {
       console.error('Error updating todos:', error);
+      throw error;
     }
   }
 };
