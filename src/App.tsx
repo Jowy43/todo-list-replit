@@ -10,7 +10,18 @@ interface Todo {
 }
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, text: "Complete project presentation", completed: true, date: new Date().toISOString().split('T')[0] },
+    { id: 2, text: "Review team updates", completed: false, date: new Date().toISOString().split('T')[0] },
+    { id: 3, text: "Send weekly report", completed: false, date: new Date(Date.now() - 86400000).toISOString().split('T')[0] },
+    { id: 4, text: "Team meeting", completed: true, date: new Date(Date.now() - 86400000).toISOString().split('T')[0] },
+    { id: 5, text: "Update documentation", completed: false, date: new Date(Date.now() - 172800000).toISOString().split('T')[0] },
+    { id: 6, text: "Code review", completed: true, date: new Date(Date.now() - 259200000).toISOString().split('T')[0] },
+    { id: 7, text: "Client presentation", completed: false, date: new Date(Date.now() - 345600000).toISOString().split('T')[0] },
+    { id: 8, text: "Project planning", completed: true, date: new Date(Date.now() - 432000000).toISOString().split('T')[0] },
+    { id: 9, text: "Budget review", completed: false, date: new Date(Date.now() - 518400000).toISOString().split('T')[0] },
+    { id: 10, text: "Strategy meeting", completed: true, date: new Date(Date.now() - 604800000).toISOString().split('T')[0] }
+  ]);
   const [inputValue, setInputValue] = useState('');
   const [darkMode, setDarkMode] = useState(true);
   const [visibleDays, setVisibleDays] = useState(7);
