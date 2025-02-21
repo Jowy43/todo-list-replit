@@ -10,7 +10,17 @@ interface Todo {
   category: string;
   priority: 'low' | 'medium' | 'high';
   dueDate: string;
+  notes?: string;
+  recurrence?: 'daily' | 'weekly' | 'monthly' | null;
+  template?: boolean;
+  reminder?: {
+    time: string;
+    notified: boolean;
+  };
 }
+
+const STORAGE_KEY = 'todo-app-data';
+const MAX_DAYS = 14;
 
 interface Statistics {
   total: number;
@@ -23,6 +33,78 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const categories = ['work', 'personal', 'shopping', 'health'];
+  const [selectedNote, setSelectedNote] = useState<number | null>(null);
+  const [noteText, setNoteText] = useState('');
+  const [currentTemplate, setCurrentTemplate] = useState<Todo | null>(null);
+
+  useEffect(() => {
+    const savedTodos = localStorage.getItem(STORAGE_KEY);
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    cleanupOldTasks();
+  }, [todos]);
+
+  const cleanupOldTasks = () => {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - MAX_DAYS);
+    setTodos(prev => prev.filter(todo => new Date(todo.date) >= twoWeeksAgo));
+  };
+
+  const exportTasks = () => {
+    const dataStr = JSON.stringify(todos, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tasks.json';
+    a.click();
+  };
+
+  const importTasks = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedTodos = JSON.parse(e.target?.result as string);
+          setTodos(prev => [...prev, ...importedTodos]);
+        } catch (err) {
+          alert('Invalid file format');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const saveAsTemplate = (todo: Todo) => {
+    setTodos(prev => [...prev, { ...todo, id: Date.now(), template: true }]);
+  };
+
+  const checkReminders = useCallback(() => {
+    todos.forEach(todo => {
+      if (todo.reminder && !todo.reminder.notified) {
+        const reminderTime = new Date(todo.date + 'T' + todo.reminder.time);
+        if (new Date() >= reminderTime) {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`Task Reminder: ${todo.text}`);
+          }
+          setTodos(prev => prev.map(t => 
+            t.id === todo.id ? { ...t, reminder: { ...t.reminder!, notified: true }} : t
+          ));
+        }
+      }
+    });
+  }, [todos]);
+
+  useEffect(() => {
+    const interval = setInterval(checkReminders, 60000);
+    return () => clearInterval(interval);
+  }, [checkReminders]);
   
   const [todos, setTodos] = useState<Todo[]>([
     { 
@@ -173,6 +255,31 @@ function App() {
             </option>
           ))}
         </select>
+
+        <div className="action-buttons">
+          <button onClick={exportTasks} className="action-button">Export Tasks</button>
+          <label className="action-button">
+            Import Tasks
+            <input
+              type="file"
+              accept=".json"
+              onChange={importTasks}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+
+        <div className="date-pagination">
+          {Array.from({ length: Math.min(14, sortedDays.length) }, (_, i) => (
+            <button
+              key={sortedDays[i]}
+              onClick={() => setSelectedDay(sortedDays[i])}
+              className={`date-button ${selectedDay === sortedDays[i] ? 'active' : ''}`}
+            >
+              {new Date(sortedDays[i]).toLocaleDateString('en-US', { day: 'numeric' })}
+            </button>
+          ))}
+        </div>
 
         <div className="todos-container">
           <ul className="todo-list">

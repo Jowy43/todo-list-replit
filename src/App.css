@@ -253,3 +253,62 @@ h1 {
 .page-info {
   font-size: 0.9rem;
 }
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.action-button {
+  padding: 0.5rem 1rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.date-pagination {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.date-button {
+  padding: 0.5rem;
+  min-width: 2.5rem;
+  border: 1px solid #646cff;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.date-button.active {
+  background-color: #646cff;
+  color: white;
+}
+
+.dark .date-button {
+  border-color: #646cff;
+}
+
+.note-editor {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(100, 108, 255, 0.1);
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #646cff;
+  background: transparent;
+  color: inherit;
+  margin-bottom: 0.5rem;
+}
