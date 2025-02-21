@@ -1,0 +1,44 @@
+
+[
+  {
+    "id": 1704931200000,
+    "text": "Complete project documentation",
+    "completed": false,
+    "date": "2024-01-11",
+    "category": "work",
+    "priority": "high",
+    "dueDate": "2024-01-15",
+    "notes": "Include all API endpoints and database schema",
+    "reminder": {
+      "time": "09:00",
+      "notified": false
+    }
+  },
+  {
+    "id": 1704844800000,
+    "text": "Buy groceries",
+    "completed": true,
+    "date": "2024-01-10",
+    "category": "shopping",
+    "priority": "medium",
+    "dueDate": "2024-01-10",
+    "notes": "Don't forget milk and bread",
+    "reminder": {
+      "time": "10:00",
+      "notified": true
+    }
+  },
+  {
+    "id": 1704758400000,
+    "text": "Morning workout",
+    "completed": false,
+    "date": "2024-01-09",
+    "category": "health",
+    "priority": "low",
+    "dueDate": "2024-01-09",
+    "reminder": {
+      "time": "07:00",
+      "notified": false
+    }
+  }
+]
