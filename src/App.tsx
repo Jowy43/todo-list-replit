@@ -76,7 +76,6 @@ function App() {
           <div className="stat-item">Total: {stats.total}</div>
           <div className="stat-item">Completed: {stats.completed}</div>
           <div className="stat-item">Pending: {stats.pending}</div>
-          <div className="stat-item">Overdue: {stats.overdue}</div>
         </div>
 
         <div className="filters">
