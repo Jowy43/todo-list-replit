@@ -74,7 +74,8 @@ This project includes integration with a Telegram bot using n8n workflow templat
 - Mark tasks as complete
 - Receive reminders
 
-![Telegram Bot Integration](https://via.placeholder.com/600x300.png?text=Telegram+Bot+Integration)
+![Telegram Bot Integration](![image](https://github.com/user-attachments/assets/f01d0258-388b-44ac-bcc9-8974ab856256)
+)
 
 ### Setting up the Telegram Bot
 
